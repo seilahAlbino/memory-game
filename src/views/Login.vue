@@ -1,6 +1,6 @@
 <template>
   <div class="login">
-    <h2>Login</h2>
+    <h1>Memory Game</h1>
     <form @submit.prevent="handleLogin">
       <div class="usernameDiv">
         <label for="username">Username</label>
@@ -13,7 +13,7 @@
       </div>
       <button class="login-button" type="submit">Login</button>
     </form>
-    <h3><a href="#">Play anonymously</a></h3>
+    <h2><a href="#" class="anonym">Play anonymously</a></h2>
   </div>
 </template>
 

@@ -11,7 +11,7 @@
         <label for="password">Password</label>
         <input type="password" id="password" v-model="password" required />
       </div>
-      <button class="login-button" type="submit">Login</button>
+      <button class="login-button" type="submit" @click.prevent="handleLogin">Login</button>
     </form>
     <h2><a href="#" class="anonym"  @click.prevent="playAnonymously">Play anonymously</a></h2>
   </div>
@@ -30,6 +30,12 @@ export default defineComponent({
     const handleLogin = () => {
       // Add login logic (API call, validation, etc.)
       console.log(`Logging in: ${username.value}`);
+
+      if(username.value === "" || password.value === "") {
+        alert("Please enter username and password");
+        return;
+      }
+      
       // Navigate to dashboard after successful login
       router.push({ name: "Dashboard" });
     };

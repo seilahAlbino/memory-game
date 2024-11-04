@@ -13,28 +13,36 @@
       </div>
       <button class="login-button" type="submit">Login</button>
     </form>
-    <h2><a href="#" class="anonym">Play anonymously</a></h2>
+    <h2><a href="#" class="anonym"  @click.prevent="playAnonymously">Play anonymously</a></h2>
   </div>
 </template>
-
 <script lang="ts">
 import { defineComponent, ref } from "vue";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
   name: "Login",
   setup() {
     const username = ref("");
     const password = ref("");
+    const router = useRouter();
 
     const handleLogin = () => {
       // Add login logic (API call, validation, etc.)
       console.log(`Logging in: ${username.value}`);
+      // Navigate to dashboard after successful login
+      router.push({ name: "Dashboard" });
     };
 
-    return { username, password, handleLogin };
+    const playAnonymously = () => {
+      // Navigate to dashboard directly
+      router.push({ name: "Dashboard" });
+    };
+
+    return { username, password, handleLogin, playAnonymously };
   },
 });
-</script>
+</script> 
 
 <style scoped>
 /* Add any login page specific styling here */

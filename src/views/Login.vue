@@ -34,8 +34,6 @@ export default defineComponent({
     let error = ref<boolean>(false);
 
     const handleLogin = () => {
-<<<<<<< HEAD
-=======
       // Add login logic (API call, validation, etc.)
       console.log(`Logging in: ${username.value}`)
 
@@ -43,8 +41,7 @@ export default defineComponent({
         alert("Please enter username and password");
         return;
       }
-      
->>>>>>> 7c2de5c815e2147c8b91b0aebf3b297ccfd42ded
+
       // Navigate to dashboard after successful login
       if(!login({name: username.value, password: password.value})){
         error.value = true;

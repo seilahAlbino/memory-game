@@ -1,6 +1,9 @@
 <template>
   <div class="login">
     <h1>Memory Game</h1>
+    <div v-if="error" class="error">
+      <p>Invalid credentials, please try again.</p>
+    </div>
     <form @submit.prevent="handleLogin">
       <div class="usernameDiv">
         <label for="username">Username</label>
@@ -19,6 +22,7 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import { useRouter } from "vue-router";
+import { login } from "../data/user";
 
 export default defineComponent({
   name: "Login",
@@ -27,11 +31,14 @@ export default defineComponent({
     const password = ref("");
     const router = useRouter();
 
+    let error = ref<boolean>(false);
+
     const handleLogin = () => {
-      // Add login logic (API call, validation, etc.)
-      console.log(`Logging in: ${username.value}`);
       // Navigate to dashboard after successful login
-      router.push({ name: "Dashboard" });
+      if(login({name: username.value, password: password.value}))
+        router.push({ name: "Dashboard" });
+
+      error.value = true;
     };
 
     const playAnonymously = () => {
@@ -39,7 +46,7 @@ export default defineComponent({
       router.push({ name: "Dashboard" });
     };
 
-    return { username, password, handleLogin, playAnonymously };
+    return { username, password, error, handleLogin, playAnonymously };
   },
 });
 </script> 

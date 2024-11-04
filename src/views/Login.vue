@@ -41,7 +41,6 @@ export default defineComponent({
         alert("Please enter username and password");
         return;
       }
-      
       // Navigate to dashboard after successful login
       if(!login({name: username.value, password: password.value})){
         error.value = true;

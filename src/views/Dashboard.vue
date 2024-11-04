@@ -33,7 +33,7 @@
     data() {
       return {
         user: {
-          name: 'Player1',
+          name: 'John Doe',
           coins: 100
         },
         selectedGameMode: 'single',

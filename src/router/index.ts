@@ -3,6 +3,9 @@ import HomeView from "../views/HomeView.vue";
 import Login from "../views/Login.vue";
 import Dashboard from "@/views/Dashboard.vue";
 import Game from "@/views/Game.vue";
+import Scoreboard from "@/views/Scoreboard.vue";
+import GameHistory from "@/views/GameHistory.vue";
+import GameSettings from "@/views/AppSettings.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -18,10 +21,25 @@ const router = createRouter({
       component: Dashboard,
     },
     {
-      path: "/game:gridSize",
+      path: "/game/:gridSize", // Define gridSize as a route parameter
       name: "Game",
       component: Game,
-      props: true,
+      props: (route) => ({ selectedGridSize: route.params.gridSize }), // Pass gridSize as selectedGridSize prop
+    },
+    {
+      path: "/scoreboard",
+      name: "Scoreboard",
+      component: Scoreboard,
+    },
+    {
+      path: "/gamehistory",
+      name: "GameHistory",
+      component: GameHistory,
+    },
+    {
+      path: "/settings",
+      name: "GameSettings",
+      component: GameSettings,
     },
     {
       path: "/about",

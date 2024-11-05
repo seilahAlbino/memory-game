@@ -3,6 +3,8 @@ import HomeView from "../views/HomeView.vue";
 import Login from "../views/Login.vue";
 import Dashboard from "@/views/Dashboard.vue";
 import Game from "@/views/Game.vue";
+import Scoreboard from "@/views/Scoreboard.vue";
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -22,6 +24,11 @@ const router = createRouter({
       name: "Game",
       component: Game,
       props: true,
+    },
+    {
+      path: "/scoreboard",
+      name: "Scoreboard",
+      component: Scoreboard,
     },
     {
       path: "/about",

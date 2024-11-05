@@ -1,5 +1,7 @@
 <template>
+  
   <div class="game">
+    <div class="container return-btn"><RouterLink to="/dashboard">Home</RouterLink></div>
     <header>
       <h1>Memory Card Game</h1>
     </header>
@@ -121,4 +123,49 @@ export default {
   color: #000;
   font-size: large;
 }
+
+.return-btn{
+  
+  display: inline-block;
+  padding: 10px 20px;
+  margin: 25px;
+  background-color: #007bff;
+  color: #fff;
+  text-align: center;
+  text-decoration: none; 
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+a{
+  color: #fff;
+  text-decoration: none;
+}
+
+.return-btn:hover {
+  background-color: #0056b3;
+}
+
+@media (max-width: 768px) {
+  .card-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .card {
+    width: 80px;
+    height: 120px;
+    font-size: medium;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .card {
+    width: auto;
+    height: 100px;
+    font-size: small;
+  }
+}
+
 </style>

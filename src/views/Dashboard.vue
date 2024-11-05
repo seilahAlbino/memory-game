@@ -20,8 +20,9 @@
         <option value="6x6">6x6</option>
       </select>
     </div>
-      <div class="scoreboard">
+      <div class="buttons">
         <button class="PlayButton" @click.prevent="goToGame">Play Game</button>
+        <button class="GameHistory" @click.prevent="goToGameHistory">Game History</button>
       </div>
 
 
@@ -57,6 +58,15 @@
     padding: 20px;
   }
   
+  .buttons{
+    display: flex;
+    flex-direction: column;
+    width: 35%;
+    justify-content: center;
+    margin-left: 32%;
+    margin-top: 5%;
+  }
+
   header h1 {
     font-size: 1.5em;
   }
@@ -85,6 +95,7 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    margin: 5px;
   }
 
   .PlayButton {

@@ -21,7 +21,7 @@
       </select>
     </div>
       <div class="scoreboard">
-        <button class="PlayButton" @click="goToGame">Play Game</button>
+        <button class="PlayButton" @click.prevent="goToGame">Play Game</button>
       </div>
 
 
@@ -43,6 +43,9 @@
     methods: {
       goToScoreboard() {
         this.$router.push({ name: 'Scoreboard' });
+      },
+      goToGame() {
+        this.$router.push({ name: 'Game', params: { gridSize: this.selectedGridSize } });
       }
     }
   };

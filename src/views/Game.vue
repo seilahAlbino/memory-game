@@ -1,7 +1,6 @@
 <template>
   
   <div class="game">
-    <div class="container return-btn"><RouterLink to="/dashboard">Home</RouterLink></div>
     <header>
       <h1>Memory Card Game</h1>
     </header>
@@ -187,6 +186,8 @@ a{
   background-color: #0056b3;
 }
 
+
+
 @media (max-width: 768px) {
   .card-grid {
     grid-template-columns: repeat(3, 1fr);
@@ -200,10 +201,14 @@ a{
 }
 
 @media (max-width: 480px) {
-
+  .card-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
   .card {
-    width: auto;
-    height: 100px;
+    
+    width: 50px;
+    height: 80px;
     font-size: small;
   }
 }

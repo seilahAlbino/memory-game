@@ -11,11 +11,9 @@
   <style scoped>
   a {
     color: rgba(235, 235, 235, 0.64);
-    text-decoration: none;
+    
   }
-  a:hover {
-    text-decoration: underline;
-  }
+
   
   .container {
     display: flex;

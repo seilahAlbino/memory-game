@@ -5,18 +5,24 @@
     <header>
       <h1>Memory Card Game</h1>
     </header>
+    <div class="back-button">
+      <router-link to="/dashboard" class="button">Home</router-link>
+    </div>
     <div class="score-board">
       <p>Score: {{ score }}</p>
       <button @click="resetGame">Reset Game</button>
     </div>
-    <div class="card-grid">
-      <div v-for="card in cards" :key="card.id" class="card" @click="flipCard(card)">
+    <div class="card-grid" :style="{ gridTemplateColumns: `repeat(${gridColumns}, 1fr)` }">
+      <div
+        v-for="card in cards"
+        :key="card.id"
+        class="card"
+        @click="flipCard(card)"
+      >
         <div v-if="card.flipped || card.matched" class="card-front">
           {{ card.value }}
         </div>
-        <div v-else class="card-back">
-          ?
-        </div>
+        <div v-else class="card-back">?</div>
       </div>
     </div>
   </div>
@@ -27,26 +33,36 @@ export default {
   props: {
     selectedGridSize: {
       type: String,
-      default: '3x4'
-    }
+      default: "3x4",
+    },
   },
   data() {
     return {
       score: 0,
       cards: [],
-      flippedCards: []
+      flippedCards: [],
     };
+  },
+  computed: {
+    gridColumns() {
+      return this.selectedGridSize.split("x")[1];
+    },
+    cardDimensions() {
+      // Adjust card size for 6x6 grid
+      return this.selectedGridSize === "6x6"
+        ? { width: "70px", height: "100px" }
+        : { width: "100px", height: "150px" };
+    },
   },
   methods: {
     initializeCards() {
       const gridSizeMap = {
-        '3x4': 6,  // 6 pairs (12 cards)
-        '4x4': 8,  // 8 pairs (16 cards)
-        '6x6': 18  // 18 pairs (36 cards)
+        "3x4": 6, // 6 pairs (12 cards)
+        "4x4": 8, // 8 pairs (16 cards)
+        "6x6": 18, // 18 pairs (36 cards)
       };
-      const pairsCount = gridSizeMap[this.selectedGridSize] || 6;
 
-      console.log(pairsCount);
+      const pairsCount = gridSizeMap[this.selectedGridSize];
 
       // Generate pairs of cards
       const values = [];
@@ -83,7 +99,7 @@ export default {
     },
     resetGame() {
       this.score = 0;
-      this.cards.forEach(card => {
+      this.cards.forEach((card) => {
         card.flipped = false;
         card.matched = false;
       });
@@ -91,17 +107,22 @@ export default {
     },
     shuffleCards() {
       this.cards = this.cards.sort(() => Math.random() - 0.5);
-    }
+    },
+    checkForWin() {
+      if (this.cards.every((card) => card.matched)) {
+        alert("You win!");
+      }
+    },
   },
   created() {
     this.initializeCards();
-  }
+  },
 };
 </script>
 
-
 <style scoped>
 .game {
+  break-inside: avoid;
   text-align: center;
 }
 .score-board {
@@ -109,9 +130,9 @@ export default {
 }
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
   gap: 10px;
 }
+
 .card {
   width: 100px;
   height: 150px;
@@ -122,6 +143,25 @@ export default {
   cursor: pointer;
   color: #000;
   font-size: large;
+}
+
+.button,
+a {
+  display: inline-block;
+  padding: 10px 20px;
+  margin-top: 20px;
+  background-color: #007bff;
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.button:hover,
+a {
+  background-color: #0056b3;
 }
 
 .return-btn{

@@ -13,19 +13,23 @@
 
 
       <div class="grid-size">
-      <label for="grid-size">Select Grid Size:</label>
-      <select id="grid-size" v-model="selectedGridSize">
-        <option value="3x4" >3x4</option>
-        <option value="4x4">4x4</option>
-        <option value="6x6">6x6</option>
-      </select>
-    </div>
-      <div class="buttons">
+        <label for="grid-size">Select Grid Size:</label>
+        <select id="grid-size" v-model="selectedGridSize">
+          <option value="3x4" >3x4</option>
+          <option value="4x4">4x4</option>
+          <option value="6x6">6x6</option>
+        </select>
+      </div>
+      <div class="scoreboard">
         <button class="PlayButton" @click.prevent="goToGame">Play Game</button>
         <button class="GameHistory" @click.prevent="goToGameHistory">Game History</button>
       </div>
-
-
+      <div class="scoreboard"> 
+        <button class="GameHistoryButton" @click.prevent="goToHistory">Game History</button>
+      </div>
+      <footer>
+        <router-link to="/settings"><font-awesome-icon :icon="['fas', 'gear']"/>&nbsp;App Settings</router-link>
+      </footer>
     </div>
   </template>
   
@@ -36,8 +40,7 @@
         user: {
           name: 'John Doe',
           coins: 100
-        },
-        selectedGameMode: 'single',
+        },        
         selectedGridSize: '3x4'
       };
     },
@@ -47,6 +50,9 @@
       },
       goToGame() {
         this.$router.push({ name: 'Game', params: { gridSize: this.selectedGridSize } });
+      },
+      goToHistory() {
+        this.$router.push({ name: 'GameHistory' });
       }
     }
   };
@@ -98,6 +104,16 @@
     margin: 5px;
   }
 
+  a{
+    text-decoration: none;
+    color: white;
+  }
+
+  a:hover{
+    text-decoration: underline;
+    color: white;
+  }
+
   .PlayButton {
    background-color: green;
   }
@@ -110,6 +126,16 @@
     background-color: #0056b3;
   }
   
+  .GameHistoryButton {
+    background-color: white;
+    color: black;
+  }
+
+  .GameHistoryButton:hover {
+    background-color: #CCC;
+    color: black;
+  }
+
   @media (min-width: 600px) {
     .dashboard {
       max-width: 600px;
@@ -124,4 +150,6 @@
       width: auto;
     }
   }
+
+ 
   </style>

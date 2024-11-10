@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-      <h1>Scoreboard</h1>
+      <h1>App Settings</h1>
       <p>
         In construction...
         <router-link to="/dashboard" class="button">lets go home</router-link>

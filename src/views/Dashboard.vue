@@ -1,19 +1,21 @@
 <template>
   <div class="dashboard">
+  <a v-if="!isAnonymous" id="logout_button" @click.prevent="Logout">Logout</a>
     <header>
       <h1>Welcome to the Dashboard</h1>
     </header>
     <div class="user-info">
-      <p >
+      <p v-if="isAnonymous">
         You are playing anonymously and have limited access.
       </p>
-
+      <p v-else>Welcome, {{ loggedInUser }}</p>
+      <p v-if="!isAnonymous">Coins: {{ coins }}</p>
     </div>
     <div class="scoreboard">
-      <button @click="goToScoreboard">View Scoreboard</button>
+      <button  v-if="!isAnonymous" @click="goToScoreboard">View Scoreboard</button>
     </div>
 
-    <div   class="grid-size">
+    <div  v-if="!isAnonymous"  class="grid-size">
       <label for="grid-size">Select Grid Size:</label>
       <select id="grid-size" v-model="selectedGridSize">
         <option value="3x4">3x4</option>
@@ -25,12 +27,12 @@
       <button class="PlayButton" @click.prevent="startGame">Play Game</button>
     </div>
     <div class="scoreboard">
-      <button   class="GameHistoryButton" @click.prevent="goToHistory">
+      <button  v-if="!isAnonymous" class="GameHistoryButton" @click.prevent="goToHistory">
         Game History
       </button>
     </div>
     <footer>
-      <router-link to="/settings"
+      <router-link  v-if="!isAnonymous" to="/settings"
         ><font-awesome-icon :icon="['fas', 'gear']" />&nbsp;App
         Settings</router-link
       >
@@ -41,15 +43,16 @@
 <script lang="ts">
 import { defineComponent, computed,ref } from "vue";
 import { useRouter } from "vue-router";
-//import { isAnonymous, loggedInUser, coins } from "../auth"; // Import the auth state
-
+import { isAnonymous, loggedInUser, coins } from "../auth"; // Import the auth state
+import {logoutUser} from "../auth";
 
 export default defineComponent({
   name: "Dashboard",
   setup() {
+
     const router = useRouter();
     const selectedGridSize = ref("3x4"); // Default value for grid size
-    //console.log(isAnonymous);
+    console.log(isAnonymous);
     const startGame = () => {
      router.push({
         name: "Game",
@@ -63,7 +66,12 @@ export default defineComponent({
       router.push({ name: "GameHistory" });
     };
 
-    return {startGame, goToScoreboard,goToHistory,selectedGridSize };
+    const Logout = () => {
+      logoutUser();
+      router.push("/");
+    };
+
+    return { isAnonymous, loggedInUser, startGame, goToScoreboard, coins,selectedGridSize, Logout};
   },
 });
 </script>
@@ -81,6 +89,10 @@ export default defineComponent({
   justify-content: center;
   margin-left: 32%;
   margin-top: 5%;
+}
+
+#logout_button{
+  
 }
 
 header h1 {

@@ -4,17 +4,16 @@
       <h1>Welcome to the Dashboard</h1>
     </header>
     <div class="user-info">
-      <p v-if="isAnonymous">
+      <p >
         You are playing anonymously and have limited access.
       </p>
-      <p v-else>Welcome, {{ loggedInUser }}</p>
-      <p>Coins: {{ coins }}</p>
+
     </div>
     <div class="scoreboard">
-      <button  v-if="!isAnonymous" @click="goToScoreboard">View Scoreboard</button>
+      <button @click="goToScoreboard">View Scoreboard</button>
     </div>
 
-    <div  v-if="!isAnonymous"  class="grid-size">
+    <div   class="grid-size">
       <label for="grid-size">Select Grid Size:</label>
       <select id="grid-size" v-model="selectedGridSize">
         <option value="3x4">3x4</option>
@@ -26,12 +25,12 @@
       <button class="PlayButton" @click.prevent="startGame">Play Game</button>
     </div>
     <div class="scoreboard">
-      <button  v-if="!isAnonymous" class="GameHistoryButton" @click.prevent="goToHistory">
+      <button   class="GameHistoryButton" @click.prevent="goToHistory">
         Game History
       </button>
     </div>
     <footer>
-      <router-link  v-if="!isAnonymous" to="/settings"
+      <router-link to="/settings"
         ><font-awesome-icon :icon="['fas', 'gear']" />&nbsp;App
         Settings</router-link
       >
@@ -42,7 +41,7 @@
 <script lang="ts">
 import { defineComponent, computed,ref } from "vue";
 import { useRouter } from "vue-router";
-import { isAnonymous, loggedInUser, coins } from "../auth"; // Import the auth state
+//import { isAnonymous, loggedInUser, coins } from "../auth"; // Import the auth state
 
 
 export default defineComponent({
@@ -50,7 +49,7 @@ export default defineComponent({
   setup() {
     const router = useRouter();
     const selectedGridSize = ref("3x4"); // Default value for grid size
-    console.log(isAnonymous);
+    //console.log(isAnonymous);
     const startGame = () => {
      router.push({
         name: "Game",
@@ -64,7 +63,7 @@ export default defineComponent({
       router.push({ name: "GameHistory" });
     };
 
-    return { isAnonymous, loggedInUser, startGame, goToScoreboard, coins,selectedGridSize };
+    return {startGame, goToScoreboard,goToHistory,selectedGridSize };
   },
 });
 </script>

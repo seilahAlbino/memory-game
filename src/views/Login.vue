@@ -24,7 +24,7 @@
 import { defineComponent, ref } from "vue";
 import { useRouter } from "vue-router";
 import { login } from "../data/user";
-import { loginUser } from "../auth"; // Import the auth functions
+//import { loginUser } from "../auth"; // Import the auth functions
 
 export default defineComponent({
   name: "Login",
@@ -46,16 +46,16 @@ export default defineComponent({
         return;
       }
 
-      loginUser(username.value); // Set the login state and username
+      //loginUser(username.value); // Set the login state and username
       router.push({ name: "Dashboard" });
     };
 
-    const playAnonymously = () => {
+    /*const playAnonymously = () => {
       loginUser("Anonymous", true); // Set login state as anonymous
       router.push({ name: "Dashboard" });
-    };
+    };*/
 
-    return { username, password, error, handleLogin, playAnonymously };
+    return { username, password, error, handleLogin };
   },
 });
 </script>

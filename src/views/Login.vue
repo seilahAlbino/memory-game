@@ -19,10 +19,12 @@
     <h2><a href="#" class="anonym"  @click.prevent="playAnonymously">Play anonymously</a></h2>
   </div>
 </template>
+
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import { useRouter } from "vue-router";
 import { login } from "../data/user";
+//import { loginUser } from "../auth"; // Import the auth functions
 
 export default defineComponent({
   name: "Login",
@@ -34,33 +36,29 @@ export default defineComponent({
     let error = ref<boolean>(false);
 
     const handleLogin = () => {
-      // Add login logic (API call, validation, etc.)
-      console.log(`Logging in: ${username.value}`)
-
-      if(username.value === "" || password.value === "") {
+      if (username.value === "" || password.value === "") {
         alert("Please enter username and password");
         return;
       }
 
-      // Navigate to dashboard after successful login
-      if(!login({name: username.value, password: password.value})){
+      if (!login({ name: username.value, password: password.value })) {
         error.value = true;
         return;
-      }  
-      
-      router.push({ name: "Dashboard" });
-      
-    };
+      }
 
-    const playAnonymously = () => {
-      // Navigate to dashboard directly
+      //loginUser(username.value); // Set the login state and username
       router.push({ name: "Dashboard" });
     };
 
-    return { username, password, error, handleLogin, playAnonymously };
+    /*const playAnonymously = () => {
+      loginUser("Anonymous", true); // Set login state as anonymous
+      router.push({ name: "Dashboard" });
+    };*/
+
+    return { username, password, error, handleLogin };
   },
 });
-</script> 
+</script>
 
 <style scoped>
 /* Add any login page specific styling here */

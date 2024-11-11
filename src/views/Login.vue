@@ -29,8 +29,8 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import { useRouter } from "vue-router";
-import { login } from "../data/user";
 import { loginUser } from "../auth"; // Import the auth functions
+import { canLogin, getCoins } from "@/data/firebase";
 
 export default defineComponent({
   name: "Login",
@@ -41,23 +41,26 @@ export default defineComponent({
 
     let error = ref<boolean>(false);
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
       if (username.value === "" || password.value === "") {
         alert("Please enter username and password");
         return;
       }
 
-      if (!login({ name: username.value, password: password.value })) {
+      const login = await canLogin({ name: username.value, password: password.value });
+
+      if (!login) {
         error.value = true;
         return;
       }
 
-      loginUser(username.value, 100);
+      const coins = await getCoins(username.value);
+
+      loginUser(username.value, coins);
       router.push({ name: "Dashboard" });
     };
     
     const playAnonymously = () => {
-      // Set a fixed number of coins for anonymous users, e.g., 10 coins
       loginUser("Anonymous", 10, true);
       router.push({ name: "Dashboard" });
     };

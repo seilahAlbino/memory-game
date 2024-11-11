@@ -8,7 +8,10 @@ import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import router from './router'
+import { loadAuthState } from "./auth"; // Import loadAuthState function
 
+// Load the saved auth state from localStorage
+loadAuthState();
 const app = createApp(App)
 
 app.use(createPinia())

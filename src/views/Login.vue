@@ -14,9 +14,15 @@
         <label for="password">Password</label>
         <input type="password" id="password" v-model="password" required />
       </div>
-      <button class="login-button" type="submit" @click.prevent="handleLogin">Login</button>
+      <button class="login-button" type="submit" @click.prevent="handleLogin">
+        Login
+      </button>
     </form>
-    <h2><a href="#" class="anonym"  @click.prevent="playAnonymously">Play anonymously</a></h2>
+    <h2>
+      <a href="#" class="anonym" @click.prevent="playAnonymously"
+        >Play anonymously</a
+      >
+    </h2>
   </div>
 </template>
 
@@ -24,7 +30,7 @@
 import { defineComponent, ref } from "vue";
 import { useRouter } from "vue-router";
 import { login } from "../data/user";
-//import { loginUser } from "../auth"; // Import the auth functions
+import { loginUser } from "../auth"; // Import the auth functions
 
 export default defineComponent({
   name: "Login",
@@ -46,16 +52,17 @@ export default defineComponent({
         return;
       }
 
-      //loginUser(username.value); // Set the login state and username
+      loginUser(username.value, 100);
+      router.push({ name: "Dashboard" });
+    };
+    
+    const playAnonymously = () => {
+      // Set a fixed number of coins for anonymous users, e.g., 10 coins
+      loginUser("Anonymous", 10, true);
       router.push({ name: "Dashboard" });
     };
 
-    /*const playAnonymously = () => {
-      loginUser("Anonymous", true); // Set login state as anonymous
-      router.push({ name: "Dashboard" });
-    };*/
-
-    return { username, password, error, handleLogin };
+    return { username, password, error, handleLogin, playAnonymously };
   },
 });
 </script>

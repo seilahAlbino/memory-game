@@ -3,6 +3,7 @@
   <div class="game">
     <header>
       <h1>Memory Card Game</h1>
+      <h2>{{selectedGridSize}}</h2>
     </header>
     <div class="back-button">
       <router-link to="/dashboard" class="button">Home</router-link>

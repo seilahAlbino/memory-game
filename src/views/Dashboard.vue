@@ -91,9 +91,7 @@ export default defineComponent({
   margin-top: 5%;
 }
 
-#logout_button{
-  
-}
+
 
 header h1 {
   font-size: 1.5em;

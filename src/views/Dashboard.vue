@@ -32,10 +32,7 @@
       </button>
     </div>
     <footer>
-      <router-link  v-if="!isAnonymous" to="/settings"
-        ><font-awesome-icon :icon="['fas', 'gear']" />&nbsp;App
-        Settings</router-link
-      >
+    <button v-if="!isAnonymous" class="appSettings" @click.prevent="goToSettings">App Settings</button>
     </footer>
   </div>
 </template>
@@ -65,13 +62,16 @@ export default defineComponent({
     const goToHistory = () => {
       router.push({ name: "GameHistory" });
     };
+    const goToSettings = () => {
+      router.push({ name: "GameSettings" });
+    };
 
     const Logout = () => {
       logoutUser();
       router.push("/");
     };
 
-    return { isAnonymous, loggedInUser, startGame, goToScoreboard,goToHistory, coins,selectedGridSize, Logout};
+    return { isAnonymous, loggedInUser, startGame, goToScoreboard,goToHistory, coins,selectedGridSize, Logout,goToSettings};
   },
 });
 </script>

@@ -71,7 +71,7 @@ export default defineComponent({
       router.push("/");
     };
 
-    return { isAnonymous, loggedInUser, startGame, goToScoreboard, coins,selectedGridSize, Logout};
+    return { isAnonymous, loggedInUser, startGame, goToScoreboard,goToHistory, coins,selectedGridSize, Logout};
   },
 });
 </script>

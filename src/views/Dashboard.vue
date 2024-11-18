@@ -312,4 +312,8 @@ button:hover {
 .modal-actions button:last-child:hover {
   background-color: #aaa;
 }
+
+#logout_button {
+    color: black;
+}
 </style>

@@ -30,7 +30,7 @@
 import { defineComponent, ref } from "vue";
 import { useRouter } from "vue-router";
 import { loginUser } from "../auth"; // Import the auth functions
-import { canLogin, getCoins } from "@/data/firebase";
+import { canLogin, getCoins, getHistory } from "@/data/firebase";
 
 export default defineComponent({
   name: "Login",
@@ -55,8 +55,9 @@ export default defineComponent({
       }
 
       const coins = await getCoins(username.value);
+      const history = await getHistory(username.value);
 
-      loginUser(username.value, coins);
+      loginUser(username.value, coins, false, history);
       router.push({ name: "Dashboard" });
     };
     

@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard">
-  <a v-if="!isAnonymous" id="logout_button" @click.prevent="Logout">Logout</a>
+    <a v-if="!isAnonymous" id="logout_button" @click.prevent="Logout">Logout</a>
     <header>
       <h1>Welcome to the Dashboard</h1>
     </header>
@@ -10,12 +10,14 @@
       </p>
       <p v-else>Welcome, {{ loggedInUser }}</p>
       <p v-if="!isAnonymous">Coins: {{ coins }}</p>
+      <!--<p v-if="!user">Loading...</p>-->
     </div>
     <div class="scoreboard">
-      <button  v-if="!isAnonymous" @click="goToScoreboard">View Scoreboard</button>
+      <button v-if="!isAnonymous" @click="goToScoreboard">
+        View Scoreboard
+      </button>
     </div>
-
-    <div  v-if="!isAnonymous"  class="grid-size">
+    <div v-if="!isAnonymous" class="grid-size">
       <label for="grid-size">Select Grid Size:</label>
       <select id="grid-size" v-model="selectedGridSize">
         <option value="3x4">3x4</option>
@@ -24,34 +26,86 @@
       </select>
     </div>
     <div class="scoreboard">
-      <button class="PlayButton" @click.prevent="startGame">Play Game</button>
+      <button class="PlayButton" @click.prevent="triggerModal">
+        Play Game
+      </button>
     </div>
     <div class="scoreboard">
-      <button  v-if="!isAnonymous" class="GameHistoryButton" @click.prevent="goToHistory">
+      <button
+        v-if="!isAnonymous"
+        class="GameHistoryButton"
+        @click.prevent="goToHistory"
+      >
         Game History
       </button>
     </div>
     <footer>
-    <button v-if="!isAnonymous" class="appSettings" @click.prevent="goToSettings">App Settings</button>
+      <button
+        v-if="!isAnonymous"
+        class="appSettings"
+        @click.prevent="goToSettings"
+      >
+        App Settings
+      </button>
     </footer>
+
+    <!-- Modal -->
+    <div v-if="showModal" class="modal-overlay">
+      <div class="modal">
+        <h2>Spend 1 Coin?</h2>
+        <p>Are you sure you want to spend 1 coin to play this game?</p>
+        <div class="modal-actions">
+          <button @click="confirmPlayGame">Yes</button>
+          <button @click="showModal = false">No</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, computed,ref } from "vue";
+import { defineComponent, ref } from "vue";
 import { useRouter } from "vue-router";
 import { isAnonymous, loggedInUser, coins } from "../auth"; // Import the auth state
-import {logoutUser} from "../auth";
+import { logoutUser } from "@/auth";
+import { removeCoins, getCoins } from "@/data/firebase";
+import { getDatabase, get, ref as dbRef } from "firebase/database";
 
 export default defineComponent({
   name: "Dashboard",
   setup() {
-
     const router = useRouter();
     const selectedGridSize = ref("3x4"); // Default value for grid size
-    console.log(isAnonymous);
-    const startGame = () => {
-     router.push({
+    const showModal = ref(false);
+    const user = ref<any>(null);
+    
+    
+    const updateCoins = async () => {
+        coins.value = await getCoins(loggedInUser.value);
+        localStorage.setItem("coins",coins.value);
+    }
+    updateCoins()
+
+    const triggerModal = () => {
+      if (selectedGridSize.value !== "3x4") {
+        showModal.value = true;
+      } else {
+        confirmPlayGame();
+      }
+    };
+
+
+    const confirmPlayGame = async () => {
+      if (selectedGridSize.value !== "3x4") {
+        const success = await removeCoins(loggedInUser.value, 1);
+        if (!success) {
+          alert("You need at least 1 coin to play this game mode!");
+          showModal.value = false;
+          return;
+        }
+      }  
+      showModal.value = false; // Close modal          
+      router.push({
         name: "Game",
         params: { gridSize: selectedGridSize.value },
       });
@@ -65,13 +119,40 @@ export default defineComponent({
     const goToSettings = () => {
       router.push({ name: "GameSettings" });
     };
+    async function getUser(name: string) {
+      const db = getDatabase();
+      const rootRef = ref(db);
+      const userRef = dbRef(db, `users/${loggedInUser.value}`); // Path to the user in Realtime Database
+      const snapshot = await get(userRef);
+      
+      if (!snapshot.exists()) {
+        console.log("User not found");
+        return null;
+      }else{
+        console.log("Database is populated:", snapshot.val());
+      }
+    };
 
     const Logout = () => {
       logoutUser();
       router.push("/");
     };
 
-    return { isAnonymous, loggedInUser, startGame, goToScoreboard,goToHistory, coins,selectedGridSize, Logout,goToSettings};
+    return {
+      isAnonymous,
+      showModal,
+      loggedInUser,
+      confirmPlayGame,
+      goToScoreboard,
+      goToHistory,
+      coins,
+      selectedGridSize,
+      Logout,
+      goToSettings,
+      triggerModal,
+      getUser,
+      user
+    };
   },
 });
 </script>
@@ -90,8 +171,6 @@ export default defineComponent({
   margin-left: 32%;
   margin-top: 5%;
 }
-
-
 
 header h1 {
   font-size: 1.5em;
@@ -172,5 +251,65 @@ button:hover {
   button {
     width: auto;
   }
+}
+
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  color: white;
+}
+
+.modal {
+  background: #181818;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  width: 300px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.modal h2 {
+  margin-top: 0;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.modal-actions button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+}
+
+.modal-actions button:first-child {
+  background-color: green;
+  color: white;
+}
+
+.modal-actions button:first-child:hover {
+  background-color: #0056b3;
+}
+
+.modal-actions button:last-child {
+  background-color: white;
+  color: black;
+}
+
+.modal-actions button:last-child:hover {
+  background-color: #aaa;
 }
 </style>

@@ -36,6 +36,37 @@ async function getUser(name: string): Promise<DataSnapshot | null> {
   return user;
 }
 
+export async function addVictoryToHistory(name: string, gridSize: string, time: number, turns: number) {
+  const victory = {
+    date: new Date().toISOString(),
+    gridSize: gridSize,
+    time: time,
+    turns: turns
+  };
+
+  const userSnapshot = await getUser(name);
+
+  if(!userSnapshot){
+    return 0;
+  }
+
+  const currentHistory = userSnapshot.exists() ? userSnapshot.val().history || [] : [];
+  currentHistory.push(victory);
+
+  const userRef = ref(db, `users/${name}/history`);
+  set(userRef, currentHistory);
+}
+
+export async function getHistory(name: string) {
+    const userSnapshot = await getUser(name);
+    if(!userSnapshot){
+        return 0;
+    }
+    const currentHistory = userSnapshot.exists() ? userSnapshot.val().history || [] : [];
+
+    return currentHistory;
+}
+
 export async function getCoins(name: string): Promise<number>{
     const userSnapshot = await getUser(name);
 
@@ -47,6 +78,44 @@ export async function getCoins(name: string): Promise<number>{
 
     return userData.coins;
 }
+
+export async function addCoins(name: string, amount: number): Promise<boolean> {
+    const userSnapshot = await getUser(name);
+    if (!userSnapshot) {
+        return false; 
+    }
+
+    const currentCoins = userSnapshot.val().coins;
+    const newCoins = currentCoins + amount;
+
+    const userRef = ref(db, `users/${name}/coins`);
+    await set(userRef, newCoins);
+
+    return true;
+}
+
+export async function removeCoins(name: string, amount: number): Promise<boolean> {
+  const userSnapshot = await getUser(name);
+
+  if (!userSnapshot) {
+    return false; 
+  }
+
+  const userData = userSnapshot.val();
+  const currentCoins = userData.coins;
+
+  if (currentCoins < amount) {
+    return false;
+  }
+
+  const newCoins = currentCoins - amount;
+
+  const userRef = ref(db, `users/${name}/coins`);
+  await set(userRef, newCoins);
+
+  return true;
+}
+
 
 export async function canLogin(user: User): Promise<boolean>{
     const userSnapshot = await getUser(user.name);

@@ -129,17 +129,13 @@
 
                 const allCardsMatched = this.cards.every(card => card.matched);
                 if (allCardsMatched) {
-                    await addVictoryToHistory(loggedInUser.value, this.selectedGridSize, this.timer, this.turns);
                     clearInterval(this.timerInterval);
-                    console.log("game ended");
                     
                     const history = await getHistory(loggedInUser.value);
-                    const isNewRecord = history.map(entry => this.timer < entry.time);
-                    console.log(history);
-
-                    console.log(isNewRecord);
+                    const isNewRecord = history.every(entry => this.timer < entry.time);
+                    
+                    await addVictoryToHistory(loggedInUser.value, this.selectedGridSize, this.timer, this.turns);
                     if (isNewRecord) {
-                      console.log("new record");
                       try {
                         const success = await addCoins(loggedInUser.value, 1);
                         this.showModal = true;

@@ -18,6 +18,22 @@
         </div>
       </div>
     </div>
+
+    <div v-if="showModalNoRecord" class="modal-overlay">
+      <div class="modal">
+        <div class="nodal-header">
+            <h2>You Won!</h2>            
+            <img src="@/assets/images/trofeu.png" alt="Trophy">
+            <p>Would you like to play again?</p>
+        </div>
+        <div class="modal-actions">
+          <button @click.prevent="restartGame">Yes</button>
+          <button @click.prevent="returnToDashboard">No</button>
+        </div>
+      </div>
+    </div>
+
+
     <div class="back-button">
       <router-link to="/dashboard" class="button">Home</router-link>
     </div>
@@ -25,7 +41,7 @@
       <p>Score: {{ score }}</p>
       <p>Time: {{ timer }}s</p>
       <p>Turns: {{ turns }}</p>
-      <button @click="resetGame">Reset Game</button>
+      <button @click.prevent="resetGame">Reset Game</button>
     </div>
     <div class="card-grid" :style="{ gridTemplateColumns: `repeat(${gridColumns}, 1fr)` }">
       <div
@@ -65,6 +81,7 @@
                 turns: 0,
                 timerInterval: null,
                 showModal: false,
+                showModalNoRecord: false,
             };
         },
         computed: {
@@ -125,11 +142,12 @@
                 this.checkIfGameEnded();
             },
             async checkIfGameEnded() {
-                if(isAnonymous.value) return;
+                
 
                 const allCardsMatched = this.cards.every(card => card.matched);
                 if (allCardsMatched) {
                     clearInterval(this.timerInterval);
+                    if(isAnonymous.value) return this.showModalNoRecord = true;
                     console.log("game ended");
                     
                     const history = await getHistory(loggedInUser.value);
@@ -146,11 +164,14 @@
                       } catch (error) {
                         console.log("Error adding coin:", error);
                       }
+                    }else{
+                      this.showModalNoRecord = true;
                     }
                 }
             },
             resetGame() {
                 this.score = 0;
+                this.showModalNoRecord = false;
                 this.cards.forEach((card) => {
                     card.flipped = false;
                     card.matched = false;
@@ -166,6 +187,13 @@
                 this.timerInterval = setInterval(() => {
                     this.timer++;
                 }, 1000);
+            },
+            returnToDashboard() {
+                this.$router.push({ name: "Dashboard" });
+            },
+            restartGame() {
+                this.resetGame();
+                this.startTimer();
             },
         },
         created() {

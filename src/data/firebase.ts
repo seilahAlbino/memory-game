@@ -67,6 +67,45 @@ export async function getHistory(name: string) {
     return currentHistory;
 }
 
+export async function getTopScoresFromUser(gridSize: string, name: string) {
+  const userSnapshot = await getUser(name);
+  if(!userSnapshot){
+      return 0;
+  }
+  const currentHistory = userSnapshot.exists() ? userSnapshot.val().history || [] : [];
+  const topScores = currentHistory.filter((victory: any) => victory.gridSize === gridSize).sort((a: any, b: any) => a.time - b.time).slice(0, 3);
+
+  return topScores;
+}
+
+
+export async function getGlobalScores(gridSize: string, type: 'time' | 'turns'): Promise<any[]> {
+  const usersRef = ref(db, `users`);
+  const snapshot = await get(usersRef);
+
+  if (!snapshot.exists()) {
+      return [];
+  }
+
+  const usersData = snapshot.val();
+  let allScores: any[] = [];
+
+  for (const username in usersData) {
+      const history = usersData[username].history || [];
+      const filteredScores = history.filter((game: any) => game.gridSize === gridSize).map((game: any) => ({
+        ...game,
+        username,
+      }));
+
+      allScores = allScores.concat(filteredScores);
+  }
+
+  return allScores.sort((a, b) => {
+    if (type == 'time') return a.time - b.time;
+    return a.turns - b.turns;
+  });
+}
+
 export async function getCoins(name: string): Promise<number>{
     const userSnapshot = await getUser(name);
 

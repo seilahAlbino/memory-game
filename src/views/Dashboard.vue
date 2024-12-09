@@ -1,19 +1,20 @@
 <template>
-  <div class="dashboard">
-    <a v-if="!isAnonymous" id="logout_button" @click.prevent="Logout">Logout</a>
+  <div class="dashboard">    
     <header>
       <h1>Welcome to the Dashboard</h1>
     </header>
+    <a v-if="!isAnonymous" id="logout_button" @click.prevent="Logout">Logout</a>
     <div class="user-info">
-      <p v-if="isAnonymous">
-        You are playing anonymously and have limited access.
-      </p>
+      <div v-if="isAnonymous">
+      <a @click.prevent="exitApp">Exit App</a>
+        <header>You are playing anonymously and have limited access.</header>
+      </div>
       <p v-else>Welcome, {{ loggedInUser }}</p>
       <p v-if="!isAnonymous">Coins: {{ coins }}</p>
-      <!--<p v-if="!user">Loading...</p>-->
+    
     </div>
     <div class="scoreboard">
-      <button v-if="!isAnonymous" @click="goToScoreboard">
+      <button  @click="goToScoreboard">
         View Scoreboard
       </button>
     </div>
@@ -119,6 +120,7 @@ export default defineComponent({
     const goToSettings = () => {
       router.push({ name: "GameSettings" });
     };
+    
     async function getUser(name: string) {
       const db = getDatabase();
       const rootRef = ref(db);
@@ -138,6 +140,10 @@ export default defineComponent({
       router.push("/");
     };
 
+    const exitApp = () => {
+      router.push("/");
+    };
+
     return {
       isAnonymous,
       showModal,
@@ -151,7 +157,8 @@ export default defineComponent({
       goToSettings,
       triggerModal,
       getUser,
-      user
+      user,
+      exitApp
     };
   },
 });
@@ -314,6 +321,6 @@ button:hover {
 }
 
 #logout_button {
-    color: black;
+    color: white;
 }
 </style>

@@ -11,7 +11,7 @@
             <th @click="sortBy('gridSize')">Board Size <span v-if="currentSort === 'gridSize'">{{ sortOrder === 'asc' ? '▲' : '▼' }}</span></th>
             <th @click="sortBy('time')">Time <span v-if="currentSort === 'time'">{{ sortOrder === 'asc' ? '▲' : '▼' }}</span></th>
             <th @click="sortBy('turns')">Turns <span v-if="currentSort === 'turns'">{{ sortOrder === 'asc' ? '▲' : '▼' }}</span></th>
-        </tr>
+          </tr>
         </thead>
         <tbody>
           <tr v-for="(game, index) in sortedGameHistory" :key="index">

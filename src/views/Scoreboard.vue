@@ -6,49 +6,98 @@
     <div class="controls">
       <div class="gridSizeContainer">
         <label for="grid-size">Select Grid Size:</label>
-        <select id="grid-size" v-model="selectedGridSize" @change="updateScores">
+        <select
+          id="grid-size"
+          v-model="selectedGridSize"
+          @change="updateScores"
+        >
           <option value="3x4">3x4</option>
           <option value="4x4">4x4</option>
           <option value="6x6">6x6</option>
         </select>
       </div>
-      <button v-if="!isAnonymous" class="personalScores" @click="toggleTable('personal')">Personal Scores</button>
-      <button class="globalScores" @click="toggleTable('global')">Global Scores</button>
+      <button
+        v-if="!isAnonymous"
+        class="personalScores"
+        @click="toggleTable('personal')"
+      >
+        Personal Scores
+      </button>
+      <button class="globalScores" @click="toggleTable('global')">
+        Global Scores
+      </button>
     </div>
 
     <div class="table-container">
-      <div class="personal" v-if="showTable === 'personal' && Array.isArray(sortedScores)">
-        <table v-if="sortedScores.length && !isAnonymous">
+      <div
+        class="personal"
+        v-if="showTable === 'personal' && !Array.isArray(sortedScores)"
+      >
+        <h1>Personal Scores</h1>
+        <h2>Top Scores (Turns)</h2>
+        <table
+          v-if="
+            sortedScores.turns.length &&
+            showTable === 'personal' &&
+            !isAnonymous
+          "
+        >
           <thead>
             <tr>
-              <th @click="sortBy('date')">Date {{ getSortIcon('date') }}</th>
+              <th @click="sortBy('date')">Date {{ getSortIcon("date") }}</th>
               <th>Board Size</th>
-              <th @click="sortBy('time')">Time {{ getSortIcon('time') }}</th>
-              <th @click="sortBy('turns')">Turns {{ getSortIcon('turns') }}</th>
+              <th @click="sortBy('turns')">Turns {{ getSortIcon("turns") }}</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(game, index) in sortedScores" :key="index">
+            <tr v-for="(game, index) in sortedScores.turns" :key="index">
               <td>{{ formatDate(game.date) }}</td>
               <td>{{ game.gridSize }}</td>
-              <td>{{ game.time }} s</td>
               <td>{{ game.turns }}</td>
             </tr>
           </tbody>
         </table>
+
+        <h2>Top Scores (Time)</h2>
+        <table
+          v-if="
+            sortedScores.times.length &&
+            showTable === 'personal' &&
+            !isAnonymous
+          "
+        >
+          <thead>
+            <tr>
+              <th @click="sortBy('date')">Date {{ getSortIcon("date") }}</th>
+              <th>Board Size</th>
+              <th @click="sortBy('time')">Time {{ getSortIcon("time") }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(game, index) in sortedScores.times" :key="index">
+              <td>{{ formatDate(game.date) }}</td>
+              <td>{{ game.gridSize }}</td>
+              <td>{{ game.time }} s</td>
+            </tr>
+          </tbody>
+        </table>
+
         <p v-else>{{ noGamesMessage }}</p>
       </div>
 
       <div class="global">
-        <div v-if="!Array.isArray(sortedScores)">
+        <div v-if="showTable === 'global' && !Array.isArray(sortedScores)">
+          <h1>Global Times</h1>
           <h2>Top Scores (Turns)</h2>
           <table v-if="sortedScores.turns.length">
             <thead>
               <tr>
                 <th>Player</th>
-                <th @click="sortBy('date')">Date {{ getSortIcon('date') }}</th>
+                <th @click="sortBy('date')">Date {{ getSortIcon("date") }}</th>
                 <th>Board Size</th>
-                <th @click="sortBy('turns')">Turns {{ getSortIcon('turns') }}</th>
+                <th @click="sortBy('turns')">
+                  Turns {{ getSortIcon("turns") }}
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -67,9 +116,9 @@
             <thead>
               <tr>
                 <th>Player</th>
-                <th @click="sortBy('date')">Date {{ getSortIcon('date') }}</th>
+                <th @click="sortBy('date')">Date {{ getSortIcon("date") }}</th>
                 <th>Board Size</th>
-                <th @click="sortBy('time')">Time {{ getSortIcon('time') }}</th>
+                <th @click="sortBy('time')">Time {{ getSortIcon("time") }}</th>
               </tr>
             </thead>
             <tbody>
@@ -83,14 +132,20 @@
           </table>
         </div>
 
-        <p v-if="showTable === 'global' && !Array.isArray(sortedScores) && !sortedScores.times.length && !sortedScores.turns.length">
+        <p
+          v-if="
+            showTable === 'global' &&
+            !Array.isArray(sortedScores) &&
+            !sortedScores.times.length &&
+            !sortedScores.turns.length
+          "
+        >
           {{ noGamesMessage }}
         </p>
       </div>
     </div>
   </div>
 </template>
-
 
 <script lang="ts">
 import { defineComponent, computed, ref, onMounted } from "vue";
@@ -104,7 +159,8 @@ export default defineComponent({
     const router = useRouter();
     const selectedGridSize = ref("3x4");
     const showTable = ref<string | null>("global");
-    const gameHistory = ref([]);
+    const timePersonalScores = ref<any[]>([]);
+    const turnsPersonalScores = ref<any[]>([]);
     const timeGlobalScores = ref<any[]>([]);
     const turnsGlobalScores = ref<any[]>([]);
     const noGamesMessage = ref("No games available.");
@@ -115,23 +171,28 @@ export default defineComponent({
     onMounted(() => {
       updateScores();
     });
-
     const updateScores = async () => {
       try {
         if (!loggedInUser.value) throw new Error("User not logged in!");
 
-        let [personalScores, timeScores, turnScores] = await Promise.all([
-          getTopScoresFromUser(selectedGridSize.value, loggedInUser.value),
-          getGlobalScores(selectedGridSize.value, 'time'),
-          getGlobalScores(selectedGridSize.value, 'turns')
-        ]);
+        const personalScores = await getTopScoresFromUser(
+          selectedGridSize.value,
+          loggedInUser.value
+        );
+        const globalTimeScores = await getGlobalScores(
+          selectedGridSize.value,
+          "time"
+        );
+        const globalTurnScores = await getGlobalScores(
+          selectedGridSize.value,
+          "turns"
+        );
 
-        timeScores = timeScores.slice(0, 3);
-        turnScores = turnScores.slice(0, 3);
+        timePersonalScores.value = personalScores.bestTimes;
+        turnsPersonalScores.value = personalScores.bestTurns;
 
-        gameHistory.value = personalScores;
-        timeGlobalScores.value = timeScores;
-        turnsGlobalScores.value = turnScores;
+        timeGlobalScores.value = globalTimeScores.slice(0, 3); // Top 3 for global
+        turnsGlobalScores.value = globalTurnScores.slice(0, 3); // Top 3 for global
       } catch (error) {
         console.error("Error fetching scores:", error);
         noGamesMessage.value = "Error fetching scores.";
@@ -139,7 +200,8 @@ export default defineComponent({
     };
 
     const sortBy = (key: string) => {
-      sortOrder.value = currentSort.value === key && sortOrder.value === "asc" ? "desc" : "asc";
+      sortOrder.value =
+        currentSort.value === key && sortOrder.value === "asc" ? "desc" : "asc";
       currentSort.value = key;
     };
 
@@ -158,36 +220,86 @@ export default defineComponent({
           turns: GameScore[];
         };
 
-    const sortedScores = computed<SortedScores | []>(() => {
+    const sortedScores = computed(() => {
+      const defaultScores = { times: [], turns: [] };
+
       if (showTable.value === "global") {
         const sortedTimeScores = [...timeGlobalScores.value].sort((a, b) => {
-          const fieldA = currentSort.value === "date" ? new Date(a[currentSort.value]).getTime() : a[currentSort.value || ""];
-          const fieldB = currentSort.value === "date" ? new Date(b[currentSort.value]).getTime() : b[currentSort.value || ""];
+          const fieldA =
+            currentSort.value === "date"
+              ? new Date(a[currentSort.value]).getTime()
+              : a[currentSort.value || ""];
+          const fieldB =
+            currentSort.value === "date"
+              ? new Date(b[currentSort.value]).getTime()
+              : b[currentSort.value || ""];
           return sortOrder.value === "asc" ? fieldA - fieldB : fieldB - fieldA;
         });
 
         const sortedTurnScores = [...turnsGlobalScores.value].sort((a, b) => {
-          const fieldA = currentSort.value === "date" ? new Date(a[currentSort.value]).getTime() : a[currentSort.value || ""];
-          const fieldB = currentSort.value === "date" ? new Date(b[currentSort.value]).getTime() : b[currentSort.value || ""];
+          const fieldA =
+            currentSort.value === "date"
+              ? new Date(a[currentSort.value]).getTime()
+              : a[currentSort.value || ""];
+          const fieldB =
+            currentSort.value === "date"
+              ? new Date(b[currentSort.value]).getTime()
+              : b[currentSort.value || ""];
           return sortOrder.value === "asc" ? fieldA - fieldB : fieldB - fieldA;
         });
 
         return { times: sortedTimeScores, turns: sortedTurnScores };
       }
 
-      return [...gameHistory.value].sort((a, b) => {
-        const fieldA = currentSort.value === "date" ? new Date(a[currentSort.value]).getTime() : a[currentSort.value || ""];
-        const fieldB = currentSort.value === "date" ? new Date(b[currentSort.value]).getTime() : b[currentSort.value || ""];
-        return sortOrder.value === "asc" ? fieldA - fieldB : fieldB - fieldA;
-      });
+      if (showTable.value === "personal") {
+        const sortedPersonalTimeScores = [...timePersonalScores.value].sort(
+          (a, b) => {
+            const fieldA =
+              currentSort.value === "date"
+                ? new Date(a[currentSort.value]).getTime()
+                : a[currentSort.value || ""];
+            const fieldB =
+              currentSort.value === "date"
+                ? new Date(b[currentSort.value]).getTime()
+                : b[currentSort.value || ""];
+            return sortOrder.value === "asc"
+              ? fieldA - fieldB
+              : fieldB - fieldA;
+          }
+        );
+
+        const sortedPersonalTurnScores = [...turnsPersonalScores.value].sort(
+          (a, b) => {
+            const fieldA =
+              currentSort.value === "date"
+                ? new Date(a[currentSort.value]).getTime()
+                : a[currentSort.value || ""];
+            const fieldB =
+              currentSort.value === "date"
+                ? new Date(b[currentSort.value]).getTime()
+                : b[currentSort.value || ""];
+            return sortOrder.value === "asc"
+              ? fieldA - fieldB
+              : fieldB - fieldA;
+          }
+        );
+
+        return {
+          times: sortedPersonalTimeScores,
+          turns: sortedPersonalTurnScores,
+        };
+      }
+
+      return defaultScores; // Always return an object with `times` and `turns` arrays
     });
 
     const toggleTable = (type: string) => {
       currentSort.value = null;
       showTable.value = type;
-    } 
+    };
     const formatDate = (date: string) => new Date(date).toLocaleString();
-    const getSortIcon = (key: string) => (currentSort.value === key ? (sortOrder.value === "asc" ? "▲" : "▼") : "");
+    const getSortIcon = (key: string) =>
+      currentSort.value === key ? (sortOrder.value === "asc" ? "▲" : "▼") : "";
     const goToDashboard = () => router.push({ name: "Dashboard" });
 
     return {
@@ -216,9 +328,8 @@ a {
 }
 
 .hidden {
-    display: none;
+  display: none;
 }
-
 
 .container {
   display: flex;

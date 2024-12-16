@@ -67,15 +67,31 @@ export async function getHistory(name: string) {
     return currentHistory;
 }
 
-export async function getTopScoresFromUser(gridSize: string, name: string) {
+export async function getTopScoresFromUser(gridSize: string, name: string): Promise<{ bestTimes: any[], bestTurns: any[] }> {
   const userSnapshot = await getUser(name);
   if(!userSnapshot){
-      return 0;
+      return { bestTimes: [], bestTurns: [] };
   }
-  const currentHistory = userSnapshot.exists() ? userSnapshot.val().history || [] : [];
-  const topScores = currentHistory.filter((victory: any) => victory.gridSize === gridSize).sort((a: any, b: any) => a.time - b.time).slice(0, 3);
 
-  return topScores;
+  const currentHistory = userSnapshot.exists() ? userSnapshot.val().history || [] : [];
+
+
+    const filteredHistory = currentHistory.filter((victory: any) => victory.gridSize === gridSize);
+
+  // Sort and slice for best times
+  const bestTimes = [...filteredHistory]
+    .sort((a: any, b: any) => a.time - b.time)
+    .slice(0, 3);
+
+  // Sort and slice for best turns
+  const bestTurns = [...filteredHistory]
+    .sort((a: any, b: any) => a.turns - b.turns)
+    .slice(0, 3);
+
+  return { bestTimes, bestTurns };
+  //const topScores = currentHistory.filter((victory: any) => victory.gridSize === gridSize).sort((a: any, b: any) => a.time - b.time).slice(0, 3);
+
+  //return topScores;
 }
 
 
@@ -155,6 +171,35 @@ export async function removeCoins(name: string, amount: number): Promise<boolean
   return true;
 }
 
+export async function addNotification(name: string, message: string) {
+  const notification = {
+    date: new Date().toISOString(),
+    message: message,
+    readed: false
+  };
+
+  const userSnapshot = await getUser(name);
+
+  if(!userSnapshot){
+    return 0;
+  }
+
+  const currentNotifications = userSnapshot.exists() ? userSnapshot.val().notifications || [] : [];
+  currentNotifications.push(notification);
+
+  const userRef = ref(db, `users/${name}/notifications`);
+  set(userRef, currentNotifications);
+}
+
+export async function getNotifications(name: string) {
+  const userSnapshot = await getUser(name);
+  if(!userSnapshot){
+      return 0;
+  }
+  const currentNotifications = userSnapshot.exists() ? userSnapshot.val().notifications || [] : [];
+
+  return currentNotifications;
+}
 
 export async function canLogin(user: User): Promise<boolean>{
     const userSnapshot = await getUser(user.name);
@@ -169,4 +214,41 @@ export async function canLogin(user: User): Promise<boolean>{
     } 
 
     return true;
+}
+
+export async function buyCoins(name: string, coins: number): Promise<boolean> {
+  const userSnapshot = await getUser(name);
+
+  if(!userSnapshot){
+      return false;
+  }
+
+  const userData = userSnapshot.val();
+
+  const currentCoins = userData.coins || 0;
+  const newCoins = currentCoins + coins;
+
+  const coinsRef = ref(db, `users/${name}/coins`);
+  const buyCoinsRef = ref(db, `users/${name}/buyCoins`);
+
+  await set(coinsRef, newCoins);
+  await set(buyCoinsRef, 0);
+  
+  return true;
+}
+
+export async function getUserRef(name: string) {
+  return ref(db, `users/${name}/buyCoins`);
+}
+
+export async function areNotificationsEnabled(name: string): Promise<boolean> {
+  const userSnapshot = await getUser(name);
+
+  if (!userSnapshot) {
+      return false;
+  }
+
+  const userData = userSnapshot.val();
+
+  return userData.getNotifications !== undefined ? userData.getNotifications : true;
 }

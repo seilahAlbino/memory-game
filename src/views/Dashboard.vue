@@ -40,6 +40,15 @@
         Game History
       </button>
     </div>
+    <div class="notifications">
+      <button
+        v-if="!isAnonymous"
+        class="NotificationsButton"
+        @click.prevent="goToNotifications"
+      >
+        Notifications
+      </button>
+    </div>
     <footer>
       <button
         v-if="!isAnonymous"
@@ -120,7 +129,10 @@ export default defineComponent({
     const goToSettings = () => {
       router.push({ name: "GameSettings" });
     };
-    
+    const goToNotifications = () => {
+      router.push({ name: "Notifications" });
+    };
+
     async function getUser(name: string) {
       const db = getDatabase();
       const rootRef = ref(db);
@@ -151,6 +163,7 @@ export default defineComponent({
       confirmPlayGame,
       goToScoreboard,
       goToHistory,
+      goToNotifications,
       coins,
       selectedGridSize,
       Logout,
@@ -234,12 +247,12 @@ button:hover {
   background-color: #0056b3;
 }
 
-.GameHistoryButton {
+.GameHistoryButton, .NotificationsButton {
   background-color: white;
   color: black;
 }
 
-.GameHistoryButton:hover {
+.GameHistoryButton:hover, .NotificationsButton:hover {
   background-color: #ccc;
   color: black;
 }

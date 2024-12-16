@@ -6,6 +6,7 @@ import Game from "@/views/Game.vue";
 import Scoreboard from "@/views/Scoreboard.vue";
 import GameHistory from "@/views/GameHistory.vue";
 import GameSettings from "@/views/AppSettings.vue";
+import Notifications from "@/views/Notifications.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -45,6 +46,11 @@ const router = createRouter({
       path: "/scoreboard",
       name: "Scoreboard",
       component: Scoreboard,
+    },
+    {
+      path: "/notifications",
+      name: "Notifications",
+      component: Notifications,
     },
     {
       path: "/about",
